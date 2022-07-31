@@ -4,13 +4,24 @@
 
 DATABASE_FILE="../data/users.db"
 
+function createDatabase {
+	read -p "Do you want to create database? (y/n)"	userAnswer
+	case $userAnswer in
+		[yY] ) echo "ok, wi well proceed";
+			touch $DATABASE_FILE;;
+		[nN] ) echo "exiting";
+			exit;;
+		*) echo "invalid response";;
+	esac
+}
+
 function databaseFileExist {
 	# Check if file exists, creates if not
 	if test -f "$DATABASE_FILE"; 
 	then
 		echo "INFO: file alread exists in $DATABASE_FILE"
 	else {
-		touch $DATABASE_FILE
+		createDatabase
 		echo "INFO: file created in  $DATABASE_FILE"
 	}
 	fi
