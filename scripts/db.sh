@@ -1,34 +1,53 @@
 #!/usr/bin/env bash
 
+# Validators
+
+DATABASE_FILE="../data/users.db"
+
+function databaseFileExist {
+	# Check if file exists, creates if not
+	if test -f "$DATABASE_FILE"; 
+	then
+		echo "INFO: file alread exists in $DATABASE_FILE"
+	else {
+		touch $DATABASE_FILE
+		echo "INFO: file created in  $DATABASE_FILE"
+	}
+	fi
+}
+
 function isALatinWord {
-	if [[ $1 =~ ^[A-Za-z_]+$ ]]; then return 0; else return 1; fi
+	# Validate latin characters
+	if [[ $1 =~ ^[A-Za-z_]+$ ]]; then return 0; 
+	else {
+		echo "ERROR: Only latin characters are allowed"
+	}
+	fi
+}
+
+
+function isAnEmptyWord {
+	# Validate empty input
+	if [[ -z $1 ]]
+	then 
+		echo "ERROR: Input cannot be empty"
+		exit 1	
+	fi
 }
 
 function isAValidInput {
-	# VALIDATE EMPTY INPUT
-	if [[ -z $1 ]]
-	then 
-		echo "ERROR: INPUT CANNOT BE EMPTY"
-		exit 1	
-	fi
-	# VALIDATE LATIN CHARACTER
+	isAnEmptyWord "$1"
 	isALatinWord "$1"
-	if [[ $? == 1 ]]
-	then
-		echo "ERROR: ENTER ONLY LATIN CHARACTERS!"
-		exit 1
-	fi
-	echo ":VALID INPUT"
-	return 0
 }
 
-addUserToDatabase(){
-	read -p "Enter User Name:" username
-	read -p "Enter Role" role	
+# Add user to database
+function addUserToDatabase {
+	read -p "Username: " username
+	read -p "Role: " role	
 	isAValidInput $username
 	isAValidInput $role
-	echo "$username, $role" >> ../data/users.db
-	
+	databaseFileExist
+	echo "$username, $role" >> $DATABASE_FILE
 }
 
 case $1 in
