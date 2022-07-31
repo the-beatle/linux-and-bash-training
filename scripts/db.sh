@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# Validators
+DATABASE_DIR="../data"
+DATABASE_FILE="$DATABASE_DIR/users.db"
 
-DATABASE_FILE="../data/users.db"
 
 function createDatabase {
 	read -p "Do you want to create database? (y/n)"	userAnswer
@@ -19,12 +19,20 @@ function databaseFileExist {
 	# Check if file exists, creates if not
 	if test -f "$DATABASE_FILE"; 
 	then
-		echo "INFO: file alread exists in $DATABASE_FILE"
+		return 0
 	else {
 		createDatabase
-		echo "INFO: file created in  $DATABASE_FILE"
+		echo "INFO: database file created in  $DATABASE_FILE"
 	}
 	fi
+}
+
+
+function backupDatabase {
+	local now=$(date +%Y_%m_%d_%I_%M_%p)
+	local backupFile="$DATABASE_DIR/$now-users.db.backup"
+	cp "$DATABASE_FILE"  $backupFile
+	echo INFO: backup file created
 }
 
 function isALatinWord {
@@ -51,6 +59,12 @@ function isAValidInput {
 	isALatinWord "$1"
 }
 
+function displayHelp {
+   	echo "add	Adds new user to database, Inptus must only contain latin words and non empty values."
+	echo "help	Displays help and importante information"
+	echo "backup	Creates a copy of the current backud."
+}
+
 # Add user to database
 function addUserToDatabase {
 	read -p "Username: " username
@@ -58,11 +72,11 @@ function addUserToDatabase {
 	isAValidInput $username
 	isAValidInput $role
 	databaseFileExist
-	echo "$username, $role" >> $DATABASE_FILE
 }
 
 case $1 in
 	add) addUserToDatabase;;
-	*) echo "unknown argument"
+	help) displayHelp;;
+	backup) backupDatabase;;
+	*) displayHelp;;
 esac
-
