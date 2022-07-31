@@ -35,6 +35,17 @@ function backupDatabase {
 	echo INFO: backup file created
 }
 
+function restoreDatabase {
+	latestBackup=$(ls -t $DATABASE_DIR/*.backup | head -1)
+	if [[ ! -f $latestBackup ]]
+	then
+		echo "ERROR: No backup file found."
+		exit 1
+	fi
+	cat $latestBackup > $DATABASE_FILE
+	echo "INFO: Database restored"
+}
+
 function isALatinWord {
 	# Validate latin characters
 	if [[ $1 =~ ^[A-Za-z_]+$ ]]; then return 0; 
@@ -63,6 +74,7 @@ function displayHelp {
    	echo "add	Adds new user to database, Inptus must only contain latin words and non empty values."
 	echo "help	Displays help and importante information"
 	echo "backup	Creates a copy of the current backud."
+	echo "restore	Restore Database from latest backup"
 }
 
 # Add user to database
@@ -78,5 +90,6 @@ case $1 in
 	add) addUserToDatabase;;
 	help) displayHelp;;
 	backup) backupDatabase;;
+	restore) restoreDatabase;;
 	*) displayHelp;;
 esac
