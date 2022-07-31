@@ -19,10 +19,10 @@ function databaseFileExist {
 	# Check if file exists, creates if not
 	if test -f "$DATABASE_FILE"; 
 	then
-		echo "INFO: file alread exists in $DATABASE_FILE"
+		return 0
 	else {
 		createDatabase
-		echo "INFO: file created in  $DATABASE_FILE"
+		echo "INFO: database file created in  $DATABASE_FILE"
 	}
 	fi
 }
@@ -51,6 +51,11 @@ function isAValidInput {
 	isALatinWord "$1"
 }
 
+function displayHelp {
+   # Display Help
+   echo "add	Adds new user to database, Inptus must only contain latin words and non empty values."
+}
+
 # Add user to database
 function addUserToDatabase {
 	read -p "Username: " username
@@ -63,6 +68,6 @@ function addUserToDatabase {
 
 case $1 in
 	add) addUserToDatabase;;
-	*) echo "unknown argument"
+	help) displayHelp;;
+	*) displayHelp;;
 esac
-
