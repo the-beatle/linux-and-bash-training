@@ -70,11 +70,31 @@ function isAValidInput {
 	isALatinWord "$1"
 }
 
+function findUserName {
+	read -p "Search username: " search
+	notFound=0
+	while read p 
+	do
+		local userName=$(echo $p | head -n1 | cut -d',' -f1)
+		if [[ $userName == $search ]]
+		then
+			let notFound=1
+			echo $p
+			
+		fi
+	done <$DATABASE_FILE
+	if [[ $notFound == 0 ]]
+	then
+		echo "INFO: User not found"
+	fi
+}
+
 function displayHelp {
    	echo "add	Adds new user to database, Inptus must only contain latin words and non empty values."
 	echo "help	Displays help and importante information"
 	echo "backup	Creates a copy of the current backud."
 	echo "restore	Restore Database from latest backup"
+	echo "find	Prompts the user to type a username, then prints username and role if such exists in the database"
 }
 
 # Add user to database
@@ -91,5 +111,6 @@ case $1 in
 	help) displayHelp;;
 	backup) backupDatabase;;
 	restore) restoreDatabase;;
+	find) findUserName;;
 	*) displayHelp;;
 esac
