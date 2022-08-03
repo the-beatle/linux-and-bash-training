@@ -89,12 +89,24 @@ function findUserName {
 	fi
 }
 
+option=$2
+function listUsers {
+    	if [[ $option == "--inverse" ]]
+    	then
+    		cat -n $DATABASE_FILE | tail -r
+		exit 1
+	else
+   		cat -n $DATABASE_FILE
+    	fi
+}
+
 function displayHelp {
    	echo "add	Adds new user to database, Inptus must only contain latin words and non empty values."
 	echo "help	Displays help and importante information"
 	echo "backup	Creates a copy of the current backud."
 	echo "restore	Restore Database from latest backup"
 	echo "find	Prompts the user to type a username, then prints username and role if such exists in the database"
+	echo "list	Returns ennumerated list of Users and Roles, OPTIONS: --inverse returns same list in opposite order"
 }
 
 # Add user to database
@@ -112,5 +124,6 @@ case $1 in
 	backup) backupDatabase;;
 	restore) restoreDatabase;;
 	find) findUserName;;
+	list) listUsers;;
 	*) displayHelp;;
 esac
