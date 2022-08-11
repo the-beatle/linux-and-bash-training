@@ -32,3 +32,9 @@ if [ -f .env ]
 then
   export $(cat .env | xargs)
 fi
+
+
+BUILD_DIR="$ROOT_DIR/dist/static"
+
+export NODE_OPTIONS=--openssl-legacy-provider
+ng build --configuration=$ENVIRONMENT --output-path=$BUILD_DIR
