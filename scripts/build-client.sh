@@ -24,3 +24,11 @@ function rootDirExists {
 rootDirExists
 cd "$ROOT_DIR"
 npm install
+
+ROOT_DIR="$(pwd)"
+
+# Export variable from .env
+if [ -f .env ]
+then
+  export $(cat .env | xargs)
+fi
