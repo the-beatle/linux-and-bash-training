@@ -38,3 +38,14 @@ BUILD_DIR="$ROOT_DIR/dist/static"
 
 export NODE_OPTIONS=--openssl-legacy-provider
 ng build --configuration=$ENVIRONMENT --output-path=$BUILD_DIR
+
+ZIP_FILEPATH="$ROOT_DIR/dist/client-app.zip"
+# Check if root directory exists
+if test -f $ZIP_FILEPATH;
+then
+  rm -r $ZIP_FILEPATH
+  zip -r $ZIP_FILEPATH $BUILD_DIR
+else {
+  zip -r $ZIP_FILEPATH $BUILD_DIR
+  }
+fi
