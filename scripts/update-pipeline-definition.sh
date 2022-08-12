@@ -12,3 +12,14 @@ else {
   exit
 }
 fi
+
+# Check if jq is installed
+jqIsInstalled="$(whereis jq)"
+echo "$jqIsInstalled"
+
+if [[ ${#jqIsInstalled} -gt 4 ]] ; then
+    echo "INFO: jq lib installed"
+else
+    echo "ERROR: Install jq lib using sudo apt-get install jq"
+    exit
+fi
