@@ -31,3 +31,12 @@ newPipelineFile="pipeline-$now.json"
 jq 'del(.metadata)' "$PIPELINE_FILEPATH" > "$newPipelineFile"
 
 
+
+# Increment version
+pipelineVersion=$(jq '.pipeline.version' "$PIPELINE_FILEPATH")
+newPipelineVersion=$(("$pipelineVersion" + 1))
+# temporal file
+tmp=$(mktemp)
+jq --argjson a "$newPipelineVersion" '.pipeline.version = [$a]' "$newPipelineFile" > "$tmp"
+
+mv $tmp $newPipelineFile
