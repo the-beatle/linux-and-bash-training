@@ -40,3 +40,53 @@ tmp=$(mktemp)
 jq --argjson a "$newPipelineVersion" '.pipeline.version = [$a]' "$newPipelineFile" > "$tmp"
 
 mv $tmp $newPipelineFile
+
+POSITIONAL_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -b|--branch)
+      BRANCH="$2"
+      echo "INFO: Updating branch: ${BRANCH}"
+      tmp=$(mktemp)
+      cat $newPipelineFile > $tmp
+      sed -i "s/{{Branch name}}/$BRANCH/" $tmp
+      mv $tmp $newPipelineFile
+      shift # past argument
+      shift # past value
+      ;;
+
+    -o|--owner)
+      OWNER="$2"
+      echo "INFO: Updating owner: ${OWNER}"
+      tmp=$(mktemp)
+      cat $newPipelineFile > $tmp
+      sed -i "s/{{GitHub Owner}}/$OWNER/" $tmp
+      mv $tmp $newPipelineFile
+      shift # past argument
+      shift # past value
+      ;;
+
+    --poll-for-source-changes)
+      POLL_FOR_SOURCE_CHANGES=true
+      echo "INFO: Udating poll for source changes: ${POLL_FOR_SOURCE_CHANGES}"
+      tmp=$(mktemp)
+      cat $newPipelineFile > $tmp
+      sed -i "s/{{PollForSourceChanges}}/$POLL_FOR_SOURCE_CHANGES/" $tmp
+      mv $tmp $newPipelineFile
+      shift # past argument
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
+
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+
