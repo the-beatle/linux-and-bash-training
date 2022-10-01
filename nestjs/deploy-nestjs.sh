@@ -21,6 +21,17 @@ scp ${BUNDLE_FILEPATH} ${USER}@${HOST}:/tmp/
 
 ssh ${USER}@${HOST} "cd /tmp/ && unzip ${APP_NAME}.zip"
 
-ssh ${USER}@${HOST} "rm -r /var/www/${APP_NAME}/*" 
+scp ${ROOT_DIR}/package* ${USER}@${HOST}:/tmp/${APP_NAME}
 
-ssh ${USER}@${HOST} "cp -r /tmp/${APP_NAME}/* /var/www/${APP_NAME}/"
+
+ssh ${USER}@${HOST} "rm -r /var/www/${APP_NAME}" 
+
+ssh ${USER}@${HOST} "cp -r /tmp/${APP_NAME} /var/www/"
+
+# to run node form ssh
+ssh ${USER}@${HOST} 'sudo -S setcap cap_net_bind_service=+ep $(which node)'
+
+ssh ${USER}@${HOST} "cd /var/www/${APP_NAME} && npm i"
+
+ssh ${USER}@${HOST} "pm2 delete all && pm2 start /var/www/${APP_NAME}/main.js -f -i 0"
+
