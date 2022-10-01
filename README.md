@@ -1,10 +1,3 @@
-Lab 2. Part 1 and 2
-
-## Click image to watch video.
-
-
-[![IMAGE ALT TEXT HERE](https://user-images.githubusercontent.com/22064174/192077972-a24bbbdc-21e6-47cb-9570-90c22fb97424.gif)](https://www.youtube.com/watch?v=Wt9bPXFhIFA)
-
 #b 1: Operating systems. Linux's basics. Command line tools.
 
 **Pre-requisites**:
