@@ -1,0 +1,7 @@
+# to run sh command
+
+add this to initial bash script
+
+#!/bin/bash
+chmod +x /path/to/yourscript.sh
+
