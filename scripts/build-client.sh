@@ -23,7 +23,7 @@ function rootDirExists {
 
 rootDirExists
 cd "$ROOT_DIR"
-npm install
+# npm install
 
 ROOT_DIR="$(pwd)"
 
@@ -33,19 +33,21 @@ then
   export $(cat .env | xargs)
 fi
 
+STATIC_FOLDER_NAME="app"
+BUILD_DIR="$ROOT_DIR/dist/${STATIC_FOLDER_NAME}" # todo: Needs to be generic
 
-BUILD_DIR="$ROOT_DIR/dist/static"
+npm run build --configuration=$ENVIRONMENT
 
-export NODE_OPTIONS=--openssl-legacy-provider
-ng build --configuration=$ENVIRONMENT --output-path=$BUILD_DIR
+echo $ENVIRONMENT
 
-ZIP_FILEPATH="$ROOT_DIR/dist/client-app.zip"
+cd "dist"
+ZIP_FILEPATH="$ROOT_DIR/dist/bundle.zip"
 # Check if root directory exists
 if test -f $ZIP_FILEPATH;
 then
   rm -r $ZIP_FILEPATH
-  zip -r $ZIP_FILEPATH $BUILD_DIR
+  zip -r $ZIP_FILEPATH $STATIC_FOLDER_NAME
 else {
-  zip -r $ZIP_FILEPATH $BUILD_DIR
+  zip -r $ZIP_FILEPATH $STATIC_FOLDER_NAME 
   }
 fi
