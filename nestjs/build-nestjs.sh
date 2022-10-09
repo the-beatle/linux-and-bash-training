@@ -1,23 +1,15 @@
 #!/usr/bin/env bash
 
-ROOT_DIR="/c/Users/Mario_Cano/cloudx/nestjs-rest-api"
-ENVIRONMENT="production"
-BUILD_DIR="dist"
-APP_NAME="nestjs"
+ORANGE="\033[4;33m"
+NC="\033[0m" # no color
+RED="\033[4;31m"
+
+if [ -f .env ]
+then
+  export $(cat .env | xargs)
+fi
 
 ZIP_FILE="${APP_NAME}.zip"
-
-function rootDirExists {
-	# Check if root directory exists
-	if test -d "$ROOT_DIR";
-	then
-		echo "INFO: Building project"
-	else {
-		echo "ERROR: directory ${ROOT_DIR} does not exist"
-		exit
-	}
-	fi
-}
 
 function zipFileExists {
 	# Check if root directory exists
@@ -32,37 +24,40 @@ function zipFileExists {
 }
 
 # Checks if root directory exists
-rootDirExists
-cd "$ROOT_DIR"
-ROOT_DIR="$(pwd)" # update url to make it absolute
-
-# Export variable from .env
-if [ -f .env ]
+if test -d "$ROOT_DIR";
 then
-  export $(cat .env | xargs)
-fi
-
-# Install and build
-npm i
-npm run build --configuration=$ENVIRONMENT
-
-# create directory to store deployments
-DEPLOYMENTS_DIR="${ROOT_DIR}/deployments"
-mkdir $DEPLOYMENTS_DIR
-
-cp -r "$ROOT_DIR/$BUILD_DIR" "$DEPLOYMENTS_DIR/$APP_NAME"
-cd "$DEPLOYMENTS_DIR"
-# if zip file exists delete it
-if test -f $ZIP_FILE;
-then
-  rm -r $ZIP_FILE
-	echo "removing zip file"
+	echo -e "${ORANGE}INFO: Building project${NC}"
 else {
-  echo "file does not exists" 
+	echo -e "${RED}ERROR: directory ${ROOT_DIR} does not exist${NC}"
+	exit
 }
 fi
 
+cd "$ROOT_DIR"
+ROOT_DIR="$(pwd)" # update url to make it absolute
+echo ${ROOT_DIR}
+
+# install and build
+npm i
+npm run build --configuration=$NODE_ENV
+
+# create directory to store deployments
+DEPLOYMENT_DIR="${ROOT_DIR}/deployments"
+mkdir $DEPLOYMENT_DIR
+
+cp -r "$ROOT_DIR/$BUILD_DIR" "$DEPLOYMENT_DIR/$APP_NAME"
+cd "$DEPLOYMENT_DIR"
+# if zip file exists delete it
+if test -f $ZIP_FILE;
+then
+ rm -r $ZIP_FILE
+ echo "removing zip file"
+else {
+ echo "file does not exists" 
+}
+fi
 zip -r $ZIP_FILE $APP_NAME
+echo "this is the zip file ${ZIP_FILE}"
 zipFileExists
 rm -r */  #delete directories
 
