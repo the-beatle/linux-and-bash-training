@@ -1,37 +1,44 @@
 #!/usr/bin/env bash
 
-# Local environment
+# Export variable from .env
+if [ -f .env ]
+then
+  export $(cat .env | xargs)
+fi
 
-ROOT_DIR="/c/Users/Mario_Cano/cloudx/nestjs-rest-api"
-APP_NAME="nestjs"
+echo "hello world ${ENV_TEST}"
 
 DEPLOYMENTS_DIR="${ROOT_DIR}/deployments"
-
 BUNDLE_FILEPATH="${DEPLOYMENTS_DIR}/${APP_NAME}.zip"
 
-# Server
-USER="$1"
-HOST="$2"
+BLUE="\033[4;33m"
+NC="\033[0m"
 
+echo -e "${BLUE}Cleaning up production files ${NC}"
+ssh -i $PUB_PATH ${USER}@${HOST} "rm -r /tmp/${APP_NAME} && rm -r /tmp/${APP_NAME}.zip"
 
-# remove temporal directories
-ssh ${USER}@${HOST} "rm -r /tmp/${APP_NAME} && rm -r /tmp/${APP_NAME}.zip"
-# copy bundle file to temporal directory
-scp ${BUNDLE_FILEPATH} ${USER}@${HOST}:/tmp/
+echo -e "${BLUE}Copying bundle file to host ${NC}"
+scp -i $PUB_PATH ${BUNDLE_FILEPATH} ${USER}@${HOST}:/tmp/
 
-ssh ${USER}@${HOST} "cd /tmp/ && unzip ${APP_NAME}.zip"
+echo -e "${BLUE} Unzipping files ${NC}"
+ssh -i $PUB_PATH ${USER}@${HOST} "cd /tmp/ && unzip ${APP_NAME}.zip"
 
-scp ${ROOT_DIR}/package* ${USER}@${HOST}:/tmp/${APP_NAME}
+echo -e "${BLUE}Copying package files to host${NC}"
+scp -i $PUB_PATH ${ROOT_DIR}/package* ${USER}@${HOST}:/tmp/${APP_NAME}
 
+echo -e "${BLUE}Installind dependencies${NC}"
+ssh -i $PUB_PATH ${USER}@${HOST} "cd /tmp/${APP_NAME} && npm install"
 
-ssh ${USER}@${HOST} "rm -r /var/www/${APP_NAME}" 
+echo -e "${BLUE}Removing App${NC}"
+ssh -i $PUB_PATH ${USER}@${HOST} "rm -r /var/www/${APP_NAME}" 
 
-ssh ${USER}@${HOST} "cp -r /tmp/${APP_NAME} /var/www/"
+echo -e "${BLUE}Restoring App${NC}"
+ssh -i $PUB_PATH ${USER}@${HOST} "cp -r /tmp/${APP_NAME} /var/www/"
 
-# to run node form ssh
-ssh ${USER}@${HOST} 'sudo -S setcap cap_net_bind_service=+ep $(which node)'
+ssh -i $PUB_PATH ${USER}@${HOST} 'sudo -S setcap cap_net_bind_service=+ep $(which node)'
 
-ssh ${USER}@${HOST} "cd /var/www/${APP_NAME} && npm i"
+ssh -i $PUB_PATH ${USER}@${HOST} "cd /var/www/${APP_NAME}"
+ssh -i $PUB_PATH ${USER}@${HOST} "pm2 delete all" 
 
-ssh ${USER}@${HOST} "pm2 delete all && pm2 start /var/www/${APP_NAME}/main.js -f -i 0"
+ssh -i $PUB_PATH ${USER}@${HOST} "export PORT=${PORT}; export NODE_ENV=${NODE_ENV} && pm2 start /var/www/${APP_NAME}/main.js -f -i 0"
 
